@@ -1,6 +1,6 @@
 CLASS ltcl_itab_aggregation DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
   PRIVATE SECTION.
-    DATA cut TYPE REF TO zcl_itab_aggregation.
+    DATA cut TYPE REF TO zexcercism_02_v02.
     METHODS setup.
     METHODS empty FOR TESTING RAISING cx_static_check.
     METHODS one_row FOR TESTING RAISING cx_static_check.
@@ -16,21 +16,21 @@ ENDCLASS.
 CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD setup.
-    cut = NEW zcl_itab_aggregation( ).
+    cut = NEW zexcercism_02_v02( ).
   ENDMETHOD.
 
   METHOD empty.
     cl_abap_unit_assert=>assert_equals(
       act = cut->perform_aggregation( VALUE #( ) )
-      exp = VALUE zcl_itab_aggregation=>aggregated_data( ) ).
+      exp = VALUE zexcercism_02_v02=>aggregated_data( ) ).
   ENDMETHOD.
 
   METHOD one_row.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 1 sum = 10 min = 10 max = 10 average = 10 ) ).
 
     cl_abap_unit_assert=>assert_equals(
@@ -41,12 +41,12 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD negative.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'A' number = -6 )
         ( group = 'A' number = 13 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 3 sum = 17 min = -6 max = 13 average = 17 / 3 ) ).
 
     cl_abap_unit_assert=>assert_equals(
@@ -57,11 +57,11 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD negative_zero.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'A' number = -10 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 2 sum = 0 min = -10 max = 10 average = 0 / 2 ) ).
 
     cl_abap_unit_assert=>assert_equals(
@@ -72,7 +72,7 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD negative_count.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'B' number = 5 )
         ( group = 'A' number = 6 )
@@ -91,12 +91,12 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD one_group.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'A' number = 6 )
         ( group = 'A' number = 13 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 3 sum = 29 min = 6 max = 13 average = 29 / 3 ) ).
 
     cl_abap_unit_assert=>assert_equals(
@@ -107,11 +107,11 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD two_groups.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'B' number = 5 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 1 sum = 10 min = 10  max = 10 average = 10 )
         ( group = 'B' count = 1 sum = 5 min = 5 max = 5 average = 5 ) ).
 
@@ -123,7 +123,7 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD aggregation.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'A' number = 10 )
         ( group = 'B' number = 5 )
         ( group = 'A' number = 6 )
@@ -131,7 +131,7 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
         ( group = 'A' number = 13 )
         ( group = 'C' number = 500 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'A' count = 3 sum = 29 min = 6 max = 13 average = 29 / 3 )
         ( group = 'B' count = 1 sum = 5 min = 5 max = 5 average = 5 / 1 )
         ( group = 'C' count = 2 sum = 522 min = 22 max = 500 average = 522 / 2 ) ).
@@ -144,7 +144,7 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
 
   METHOD aggregation_extended.
 
-    DATA(actual_values) = VALUE zcl_itab_aggregation=>initial_numbers(
+    DATA(actual_values) = VALUE zexcercism_02_v02=>initial_numbers(
         ( group = 'D' number = 10 )
         ( group = 'E' number = 10 )
         ( group = 'D' number = 6 )
@@ -152,7 +152,7 @@ CLASS ltcl_itab_aggregation IMPLEMENTATION.
         ( group = 'D' number = 13 )
         ( group = 'F' number = 500 ) ).
 
-    DATA(expected_values) = VALUE zcl_itab_aggregation=>aggregated_data(
+    DATA(expected_values) = VALUE zexcercism_02_v02=>aggregated_data(
         ( group = 'D' count = 3 sum = 29 min = 6 max = 13 average = 29 / 3 )
         ( group = 'E' count = 1 sum = 10 min = 10 max = 10 average = 10 / 1 )
         ( group = 'F' count = 2 sum = 522 min = 22 max = 500 average = 522 / 2 ) ).

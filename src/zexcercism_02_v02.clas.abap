@@ -36,56 +36,52 @@ ENDCLASS.
 CLASS zexcercism_02_v02 IMPLEMENTATION.
 
   METHOD perform_aggregation.
-  data i_initial_numbers type initial_numbers.
-  i_initial_numbers = Value #(
-    ( group = 'A' number = 10 )
-    ( group = 'B' number = 5 )
-    ( group = 'A' number = 6 )
-    ( group = 'C' number = 22 )
-    ( group = 'A' number = 13 )
-    ( group = 'C' number = 500 )
-    ).
 
-   data: a_numbers type table of i,
-         b_numbers type table of i,
-         c_numbers type table of i.
-   data wa_a_numbers like line of a_numbers.
 
-   data number_wa like line of i_initial_numbers.
-   loop at i_initial_numbers into number_wa.
-        if number_wa-group = 'A'.
-        aggregated_data[ 1 ]-group = 'A'.
-        aggregated_data[ 1 ]-count += 1.
-        append number_wa-number to a_numbers.
-        elseif number_wa-group = 'B'.
-        aggregated_data[ 2 ]-group = 'B'.
-        aggregated_data[ 2 ]-count += 1.
-        append number_wa-number to b_numbers.
+    loop at initial_numbers ASSIGNING FIELD-SYMBOL(<fs_a>).
+        if lines( aggregated_data ) > 0.
+        data wa_agg like line of aggregated_data.
+            loop at aggregated_data into data(temp).
+             if temp-group = <fs_a>-group.
+                temp-count = temp-count + 1.
+                temp-sum = temp-sum + <fs_a>-number.
+                temp-average = temp-sum / temp-count.
+                if temp-min > <fs_a>-number.
+                        temp-min = <fs_a>-number.
+                   endif.
+                if temp-max < <fs_a>-number.
+                                temp-max = <fs_a>-number.
+                   endif.
+             elseif temp-group <> <fs_a>-group.
+                    wa_agg-group = <fs_a>-group.
+                    wa_agg-count = wa_agg-count + 1.
+                    wa_agg-sum = wa_agg-sum + <fs_a>-number.
+                    wa_agg-average = wa_agg-sum / wa_agg-count.
+                    if wa_agg-min > <fs_a>-number.
+                        wa_agg-min = <fs_a>-number.
+                    endif.
+                    if wa_agg-max < <fs_a>-number.
+                                wa_agg-max = <fs_a>-number.
+                    endif.
+                    append wa_agg to aggregated_data.
+              endif.
+             endloop.
         else.
-        aggregated_data[ 3 ]-group = 'C'.
-        aggregated_data[ 3 ]-count += 1.
-        append number_wa-number to c_numbers.
+
+        data fs_c like LINE OF aggregated_data.
+
+        fs_c-group = <fs_a>-group.
+        fs_c-count = fs_c-count + 1.
+        fs_c-sum = fs_c-sum + <fs_a>-number.
+        fs_c-average = fs_c-sum / fs_c-count.
+        fs_c-min = <fs_a>-number.
+        fs_c-max = <fs_a>-number.
+        append fs_c to aggregated_data.
+
+
         endif.
-   endloop.
+    endloop.
 
-   loop at a_numbers ASSIGNING field-symbol(<el_for_sum>).
-        aggregated_data[ 1 ]-sum += <el_for_sum>.
-   endloop.
-   aggregated_data[ 1 ]-average = aggregated_data[ 1 ]-sum / lines( a_numbers ).
-
-   sort a_numbers ASCENDING.
-   aggregated_data[ 1 ]-min = a_numbers[ 1 ].
-   aggregated_data[ 1 ]-max = a_numbers[ lines( a_numbers ) ].
-
-   sort b_numbers ASCENDING.
-   aggregated_data[ 2 ]-min = b_numbers[ 1 ].
-   aggregated_data[ 2 ]-max = b_numbers[ lines( b_numbers ) ].
-
-   sort c_numbers ASCENDING.
-   aggregated_data[ 3 ]-min = c_numbers[ 1 ].
-   aggregated_data[ 3 ]-max = c_numbers[ lines( c_numbers ) ].
-      " add solution here
-    ENDMETHOD.
-
+ENDMETHOD.
 ENDCLASS.
 
