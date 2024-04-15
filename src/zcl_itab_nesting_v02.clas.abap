@@ -91,43 +91,40 @@ loop at artists ASSIGNING FIELD-SYMBOL(<art>).
    loop at nested_data ASSIGNING FIELD-SYMBOL(<nest>) where artist_id = <art>-artist_id.
    endloop.
     if sy-subrc = 4.
-   data wa_art like line of nested_data.
-   wa_art-artist_id = <art>-artist_id.
-   wa_art-artist_name = <art>-artist_name.
-        loop at albums ASSIGNING FIELD-SYMBOL(<album>) where artist_id = <art>-artist_id.
+        data wa_art like line of nested_data.
+        wa_art-artist_id = <art>-artist_id.
+        wa_art-artist_name = <art>-artist_name.
+            loop at albums ASSIGNING FIELD-SYMBOL(<album>) where artist_id = <art>-artist_id.
+                if <album>-artist_id = <art>-artist_id.
+                    append value #( album_id = <album>-album_id album_name = <album>-album_name ) to wa_art-albums.
 
-            if <album>-artist_id = <art>-artist_id.
-            append value #( album_id = <album>-album_id album_name = <album>-album_name ) to wa_art-albums.
-                    endif.
-        loop at nested_data assigning FIELD-SYMBOL(<nest_2>).
-        data wa_ong like line of <nest_2>-albums.
-        data wa_got like line of wa_ong-songs.
+                endif.
+             endloop.
+                insert wa_art into TABLE nested_data.
+                clear wa_art.
+                    loop at nested_data assigning FIELD-SYMBOL(<nest_2>) where artist_id = <art>-artist_id.
+*                        data wa_ong like line of <nest_2>-albums.
+*                        data wa_got like line of wa_ong-songs.
+                            loop at <nest_2>-albums ASSIGNING FIELD-SYMBOL(<data>).
+                                loop at songs ASSIGNING FIELD-SYMBOL(<song>) where artist_id = <nest_2>-artist_id
+                                                                             and album_id = <data>-album_id.
+*                                   if <song>-artist_id = <nest_2>-artist_id and <song>-album_id = <data>-album_id.
+                                        append value #( song_id = <song>-song_id song_name = <song>-song_name ) to <data>-songs.
+*                                        append wa_got to <data>-songs.
+*                                        clear wa_got.
+*                                   endif.
+                               endloop.
 
-loop at <nest_2>-albums ASSIGNING FIELD-SYMBOL(<data>).
-    loop at songs ASSIGNING FIELD-SYMBOL(<song>).
-        if <nest_2>-artist_id = <song>-artist_id and <data>-album_id = <song>-album_id.
-            wa_got = value #( song_id = <song>-song_id song_name = <song>-song_name ).
-        endif.
-        append wa_got TO wa_ong-songs.
-    endloop.
-endloop.
-endloop.
-
-
-
-         endloop.
-    insert wa_art into TABLE nested_data.
-   clear wa_art.
+                            endloop.
+                    endloop.
+*            endloop.
+*        insert wa_art into TABLE nested_data.
+*        clear wa_art.
    elseif sy-subrc = 0.
         exit.
    endif.
 endloop.
 
-
-
-
-
-  ENDMETHOD.
-
+ENDMETHOD.
 ENDCLASS.
 
