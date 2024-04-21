@@ -65,7 +65,46 @@ CLASS zcl_high_scores_v02 IMPLEMENTATION.
 
   METHOD personaltopthree.
     " add solution here
+    DATA: top_atm      TYPE i,
+          index_atm    TYPE i,
+          top_atm_indx TYPE i.
+    index_atm = lines( scores_list ).
+    LOOP AT scores_list ASSIGNING FIELD-SYMBOL(<abc>).
+      WHILE lines( scores_list ) >= 1 AND lines( result ) < 3.
+        LOOP AT scores_list ASSIGNING FIELD-SYMBOL(<test>).
+          IF lines( scores_list ) > 1.
+            LOOP AT scores_list ASSIGNING FIELD-SYMBOL(<max>).
+              IF lines( result ) = 3.
+                EXIT.
+              ELSE.
+                top_atm = scores_list[ index_atm ].
+                top_atm_indx = index_atm.
+                LOOP AT scores_list ASSIGNING FIELD-SYMBOL(<pb>).
+                  IF sy-tabix >= 1.
+                    IF <pb> < top_atm.
+                      CONTINUE.
+                    ELSE.
+                      top_atm = <pb>.
+                      top_atm_indx = sy-tabix.
+                    ENDIF.
+                  ENDIF.
+                ENDLOOP.
+                APPEND top_atm TO result.
+                DELETE scores_list INDEX top_atm_indx.
+                CLEAR: top_atm,
+                       top_atm_indx.
+                index_atm = lines( scores_list ).
 
+              ENDIF.
+            ENDLOOP.
+
+          ELSEIF lines( scores_list ) = 1 AND lines( result ) < 3.
+            APPEND scores_list[ 1 ] TO result.
+            DELETE scores_list INDEX 1.
+          ENDIF.
+        ENDLOOP.
+      ENDWHILE.
+    ENDLOOP.
   ENDMETHOD.
 
 
