@@ -21,8 +21,8 @@ CLASS zcl_clock DEFINITION
   PRIVATE SECTION.
 
 * add solution here
-    data clock type t.
-    data final_clock type string.
+    data clock type utclong.
+    data wynik type utclong.
 
 ENDCLASS.
 
@@ -32,39 +32,32 @@ CLASS zcl_clock IMPLEMENTATION.
 
   METHOD add.
 * add solution here
+        clock = utclong_add( val = clock minutes = !minutes ).
   ENDMETHOD.
 
 
   METHOD constructor.
 * add solution here
-   data hours_t type string.
-   data minutes_t type string.
-   hours_t = !hours.
-   condense hours_t.
-   if !hours < 10.
-    hours_t = |{ 0 }{ hours_t }|.
-    else. endif.
-   minutes_t = !minutes.
-   condense minutes_t.
-   if !minutes < 10.
-    minutes_t = |{ 0 }{ minutes_t }|.
-    else. endif.
-   data(test) = strlen( hours_t ).
-    clock = replace( val = clock off = 0 len = 2 with = hours_t  ).
-    clock = replace( val = clock off = 2 len = 2 with = minutes_t ).
-    final_clock = |{ substring( val = clock off = 0 len = 2 ) }:{ substring( val = clock off = 2 len = 2 ) }|.
+
+    data(wynik) = utclong_current(  ).
+    wynik = '2000-01-01 00:00:00.0000000'.
+    wynik = utclong_add( val = wynik hours = !hours minutes = !minutes ).
+    clock = wynik.
 
   ENDMETHOD.
 
 
   METHOD get.
 * add solution here
-    result = final_clock.
+    data final type string.
+    final = clock.
+    result = final+11(5).
   ENDMETHOD.
 
 
   METHOD sub.
 * add solution here
+       clock = utclong_add( val = clock minutes = ( !minutes * -1 ) ).
   ENDMETHOD.
 ENDCLASS.
 
