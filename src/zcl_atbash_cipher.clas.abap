@@ -21,6 +21,122 @@ CLASS zcl_atbash_cipher IMPLEMENTATION.
 
   METHOD decode.
 * todo
+data index type i value 0.
+ data(input) = to_lower( cipher_text ).
+ do strlen( input ) times.
+    case input+index(1).
+    when 'a'.
+    plain_text = insert( val = plain_text sub = 'z' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'b'.
+    plain_text = insert( val = plain_text sub = 'y' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'c'.
+    plain_text = insert( val = plain_text sub = 'x' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'd'.
+    plain_text = insert( val = plain_text sub = 'w' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'e'.
+    plain_text = insert( val = plain_text sub = 'v'  off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'f'.
+    plain_text = insert( val = plain_text sub = 'u' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'g'.
+    plain_text = insert( val = plain_text sub = 't' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'h'.
+    plain_text = insert( val = plain_text sub = 's' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'i'.
+    plain_text = insert( val = plain_text sub = 'r' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'j'.
+    plain_text = insert( val = plain_text sub = 'q' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'k'.
+    plain_text = insert( val = plain_text sub = 'p' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'l'.
+    plain_text = insert( val = plain_text sub = 'o' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'm'.
+    plain_text = insert( val = plain_text sub = 'n' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'n'.
+    plain_text = insert( val = plain_text sub = 'm' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'o'.
+    plain_text = insert( val = plain_text sub = 'l' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'p'.
+    plain_text = insert( val = plain_text sub = 'k' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'q'.
+    plain_text = insert( val = plain_text sub = 'j' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'r'.
+    plain_text = insert( val = plain_text sub = 'i' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 's'.
+    plain_text = insert( val = plain_text sub = 'h' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 't'.
+    plain_text = insert( val = plain_text sub = 'g' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'u'.
+    plain_text = insert( val = plain_text sub = 'f' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'v'.
+    plain_text = insert( val = plain_text sub = 'e' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'w'.
+    plain_text = insert( val = plain_text sub = 'd' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'x'.
+    plain_text = insert( val = plain_text sub = 'c' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'y'.
+    plain_text = insert( val = plain_text sub = 'b' off = strlen( plain_text ) ).
+    index = index + 1.
+    when 'z'.
+    plain_text = insert( val = plain_text sub = 'a' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '1'.
+    plain_text = insert( val = plain_text sub = '1' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '2'.
+    plain_text = insert( val = plain_text sub = '2' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '3'.
+    plain_text = insert( val = plain_text sub = '3' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '4'.
+    plain_text = insert( val = plain_text sub = '4' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '5'.
+    plain_text = insert( val = plain_text sub = '5' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '6'.
+    plain_text = insert( val = plain_text sub = '6' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '7'.
+    plain_text = insert( val = plain_text sub = '7' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '8'.
+    plain_text = insert( val = plain_text sub = '8' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '9'.
+    plain_text = insert( val = plain_text sub = '9' off = strlen( plain_text ) ).
+    index = index + 1.
+    when '0'.
+    plain_text = insert( val = plain_text sub = '0' off = strlen( plain_text ) ).
+    index = index + 1.
+    when others.
+    index = index + 1.
+ endcase.
+enddo.
   ENDMETHOD.
 
   METHOD encode.
@@ -145,21 +261,20 @@ CLASS zcl_atbash_cipher IMPLEMENTATION.
  enddo.
 
     data index_out type i value 5.
-    if strlen( cipher_text ) > 5.
-        do strlen( cipher_text ) / 5 times.
+    data blank type string value ` `.
+        do strlen( cipher_text ) div 5 times.
             if index_out < strlen( cipher_text ).
                 if index_out = 5.
-                    cipher_text = insert( val = cipher_text sub = '%' off = index_out ).
+                    cipher_text = insert( val = cipher_text sub = blank off = index_out ).
                     index_out = index_out + 6.
                 else.
-                    cipher_text = insert( val = cipher_text sub = '%' off = index_out ).
+                    cipher_text = insert( val = cipher_text sub = blank off = index_out ).
                     index_out = index_out + 6.
                 endif.
              else. exit. endif.
         enddo.
-    else. exit. endif.
-    data blank type c length 9999.
-    OVERLAY cipher_text with blank ONLY '%'.
+*    data blank type c length 9999.
+*    OVERLAY cipher_text with blank ONLY '%'.
       ENDMETHOD.
 ENDCLASS.
 
