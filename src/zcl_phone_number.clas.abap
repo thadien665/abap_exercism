@@ -23,7 +23,7 @@ CLASS zcl_phone_number IMPLEMENTATION.
 " add your code here
   data c type c.
   data test type string.
-  test = !number.
+  test = number.
   data ind type i value 0.
 
     REPLACE all OCCURRENCES OF ` ` in test with ''.
@@ -39,19 +39,23 @@ CLASS zcl_phone_number IMPLEMENTATION.
             endif.
     endwhile.
 
-  if strlen( test ) > 11 or strlen( test ) < 10.
-    raise EXCEPTION type cx_parameter_invalid.
-  elseif strlen( test ) = 11 and test+0(1) <> 1.
-       raise EXCEPTION type cx_parameter_invalid.
-  elseif strlen( test ) = 10 and test+0(1) CO '23456789'.
-    if test+4(1) CO '23456789'.
-    result = test.
-    else.
-    raise EXCEPTION type cx_parameter_invalid.
+    if strlen( test ) = 11.
+        if test+0(1) = 1.
+            test = shift_left( val = test places = 1 ).
+        else.
+            raise EXCEPTION type cx_parameter_invalid.
+        endif.
     endif.
-    else.
-    raise EXCEPTION type cx_parameter_invalid.
-  endif.
+
+    if strlen( test ) = 10.
+        if test+0(1) CO '23456789' and test+3(1) CO '23456789'.
+            result = test.
+        else.
+            raise EXCEPTION type cx_parameter_invalid.
+        endif.
+    elseif strlen( test ) < 10 or strlen( test ) > 11.
+        raise EXCEPTION type cx_parameter_invalid.
+    endif.
 
   ENDMETHOD.
 ENDCLASS.
