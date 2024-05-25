@@ -19,64 +19,84 @@ CLASS ZCL_MINESWEEPER_V02 IMPLEMENTATION.
     " add solution here
 
     data a type i.
-    data a_t type string.
     data ind type i value 0.
     data row type string.
+    data row_p type string.
+    data row_n type string.
+    data b type i value 0.
 
     loop at input ASSIGNING FIELD-SYMBOL(<a>).
         ind = 0.
         while ind < strlen( <a> ).
             if <a>+ind(1) <> '*'.
-                if ind = 0.
-                    a = count_any_of( val = <a> sub = '*' off = ind len = 2 ).
-                        if line_exists( input[ sy-tabix - 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix - 1 ] sub = '*' off = ind len = 2 ).
+                if line_exists( input[ sy-tabix - 1 ] ).
+                    row_p = input[ sy-tabix - 1 ].
+                    b = 0.
+                    while b < strlen( input[ sy-tabix - 1 ] ).
+*                        if b not BETWEEN ind - 1 and ind + 1.
+                         if b < ind - 1 or b > ind + 1.
+                            b = b + 1.
+                            continue.
+                        else.
+                            if row_p+b(1) = '*'.
+                                a = a + 1.
+                                b = b + 1.
+                            else.
+                                b = b + 1.
+                                continue.
+                            endif.
                         endif.
-                        if line_exists( input[ sy-tabix + 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix + 1 ] sub = '*' off = ind len = 2 ).
-                        endif.
-                    if a <> 0.
-                        row = row && a.
-                    else.
-                        row = |{ row } |.
-                    endif.
-                    ind = ind + 1.
-
-                elseif ind = strlen( <a> ) or ind = strlen( <a> ) - 1.
-                    a = count_any_of( val = <a> sub = '*' off = ind - 1 len = 2 ).
-                        if line_exists( input[ sy-tabix - 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix - 1 ] sub = '*' off = ind - 1 len = 2 ).
-                        endif.
-                        if line_exists( input[ sy-tabix + 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix + 1 ] sub = '*' off = ind - 1 len = 2 ).
-                        endif.
-                    if a <> 0.
-                        row = row && a.
-                    else.
-                        row = |{ row } |.
-                    endif.
-                    ind = ind + 1.
-                else.
-                    a = count_any_of( val = <a> sub = '*' off = ind - 1 len = 3 ).
-                        if line_exists( input[ sy-tabix - 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix - 1 ] sub = '*' off = ind - 1 len = 3 ).
-                        endif.
-                        if line_exists( input[ sy-tabix + 1 ] ).
-                            a = a + count_any_of( val = input[ sy-tabix + 1 ] sub = '*' off = ind - 1 len = 3 ).
-                        endif.
-                    if a <> 0.
-                        row = row && a.
-                    else.
-                        row = |{ row } |.
-                    endif.
-                    ind = ind + 1.
+                    endwhile.
                 endif.
+                if line_exists( input[ sy-tabix + 1 ] ).
+                    row_n = input[ sy-tabix + 1 ].
+                    b = 0.
+                    while b < strlen( input[ sy-tabix + 1 ] ).
+*                        if b not BETWEEN ind - 1 and ind + 1.
+                         if b < ind - 1 or b > ind + 1.
+                            b = b + 1.
+                            continue.
+                        else.
+                            if row_n+b(1) = '*'.
+                                a = a + 1.
+                                b = b + 1.
+                            else.
+                                b = b + 1.
+                                continue.
+                            endif.
+
+                        endif.
+                    endwhile.
+                endif.
+                   b = 0.
+                    while b < strlen( input[ sy-tabix ] ).
+*                        if b not BETWEEN ind - 1 and ind + 1.
+                        if b < ind - 1 or b > ind + 1.
+                            b = b + 1.
+                            continue.
+                        else.
+                            if <a>+b(1) = '*'.
+                                a = a + 1.
+                                b = b + 1.
+                            else.
+                                b = b + 1.
+                                continue.
+                            endif.
+                        endif.
+                   endwhile.
             else.
                 row = row && '*'.
                 ind = ind + 1.
                 CONTINUE.
             endif.
-        ENDWHILE.
+              if a <> 0.
+                 row = row && a.
+              else.
+                 row = |{ row } |.
+              endif.
+              ind = ind + 1.
+              clear a.
+        endwhile.
         append row to result.
         clear row.
     endloop.
