@@ -28,8 +28,11 @@ CLASS zcl_book_store IMPLEMENTATION.
   METHOD calculate_total.
     " add solution here
 
+  data summ type p LENGTH 3 DECIMALS 2.
 
-  data summ_table type table of p.
+  types summ type p LENGTH 3 DECIMALS 2.
+
+  data summ_table type table of summ.
 
 
     data temp_table type table of string.
@@ -83,7 +86,12 @@ CLASS zcl_book_store IMPLEMENTATION.
                             exit.
                         endif.
                      else.
-                        continue.
+                         if ind = lines( temp_table ).
+                            append temp to temp_table.
+                            exit.
+                         else.
+                            CONTINUE.
+                         endif.
                      endif.
              ENDLOOP.
         endif.
@@ -93,7 +101,7 @@ CLASS zcl_book_store IMPLEMENTATION.
 
 
 
-      data summ type p LENGTH 3 DECIMALS 2.
+
       loop at temp_table ASSIGNING FIELD-SYMBOL(<b>).
         case strlen( <b> ).
             when 10.
@@ -111,9 +119,9 @@ CLASS zcl_book_store IMPLEMENTATION.
       append summ to summ_table.
       clear summ.
       clear temp_table.
+  endloop.
 
-
-      loop at basket_p ASSIGNING <a>.
+  loop at basket_p ASSIGNING <a>.
         temp = <a>.
         if lines( temp_table ) = 0.
             append temp to temp_table.
@@ -123,7 +131,7 @@ CLASS zcl_book_store IMPLEMENTATION.
                 ind = sy-tabix.
                     if temp NE basket_p[ 1 ].
                       if  ind NE lines( temp_table ).
-                           if strlen( <existing_row> ) > strlen( temp_table[ ind + 1 ] ).
+                           if strlen( <existing_row> ) >= strlen( temp_table[ ind + 1 ] ).
                                 CONTINUE.
                            else.
                                if <existing_row> CS temp.
@@ -145,12 +153,26 @@ CLASS zcl_book_store IMPLEMENTATION.
         endif.
       ENDLOOP.
 
-  endloop.
+      loop at temp_table ASSIGNING <b>.
+        case strlen( <b> ).
+            when 10.
+                summ = summ + '30'.
+            when 8.
+                summ = summ + '25.6'.
+            when 6.
+                summ = summ + '21.6'.
+            when 4.
+                summ = summ + '15.2'.
+            when 2.
+                summ = summ + '8'.
+        ENDCASE.
+      endloop.
+      append summ to summ_table.
 
 
 
 
-  sort summ_table DESCENDING.
+  sort summ_table ascending.
   total = summ_table[ 1 ].
 
 
