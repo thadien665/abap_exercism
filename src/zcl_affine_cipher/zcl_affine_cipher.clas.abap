@@ -21,7 +21,7 @@ CLASS zcl_affine_cipher DEFINITION
              RETURNING VALUE(phrase) TYPE string
              RAISING   cx_parameter_invalid,
       get_prime_numbers
-             IMPORTING m             TYPE i
+             IMPORTING m_number      TYPE i
              RETURNING value(prime_numbers) type integertab,
       check_coprime
              importing x type i
@@ -42,31 +42,24 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
 
     data m type i value 26.
 
-    data(prime_numbers_m) = get_prime_numbers( m = m ).
+    data(prime_numbers_m) = get_prime_numbers( m_number = m ).
 
-    data(prime_numbers_a) = get_prime_numbers( m = key-a ).
+    data(prime_numbers_a) = get_prime_numbers( m_number = key-a ).
 
     data(check_coprime_m) = check_coprime( dividers = prime_numbers_m x = key-a ).
     data(check_coprime_a) = check_coprime( dividers = prime_numbers_a x = m ).
 
     data index_of_phrase type i value 0.
     data alphabet type string value 'abcdefghijklmnopqrstuvwxyz'.
-    data special_letters type string value ',./_-!@#$%^&*()+=[{]}\|:;?'.
+    data special_letters type string value ',.'.
     data index_of_letter type i value 0.
     data temporary_index type i value 0.
     data new_index type i value 0.
 
     data lower_phrase type string.
 
-    while index_of_letter NE strlen( phrase ).
-        if phrase+index_of_letter(1) CA special_letters or phrase+index_of_letter(1) = ` `.
-            index_of_letter = index_of_letter + 1.
-            continue.
-        else.
-            lower_phrase = lower_phrase && to_lower( phrase+index_of_letter(1) ).
-            index_of_letter = index_of_letter + 1.
-        endif.
-    ENDWHILE.
+    lower_phrase = to_lower( translate( val = phrase from = special_letters to = '' ) ).
+    replace all OCCURRENCES OF ` ` in lower_phrase with ''.
 
     do strlen( lower_phrase ) + 1 div 5 times.
         do 5 times.
@@ -104,9 +97,9 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
     data alphabet_lenght type i VALUE 26.
     data m type i value 26.
 
-    data(prime_numbers_m) = get_prime_numbers( m = alphabet_lenght ).
+    data(prime_numbers_m) = get_prime_numbers( m_number = alphabet_lenght ).
 
-    data(prime_numbers_a) = get_prime_numbers( m = key-a ).
+    data(prime_numbers_a) = get_prime_numbers( m_number = key-a ).
 
     data(check_coprime_m) = check_coprime( dividers = prime_numbers_m x = key-a ).
     data(check_coprime_a) = check_coprime( dividers = prime_numbers_a x = m ).
@@ -152,20 +145,18 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
   method get_prime_numbers.
         data divider type i value 2.
         data prime_table_m type table of i.
+        data temp_number type i.
 
-        while divider NE ( m / 2 ) + 1.
-        if m mod divider = 0.
-            loop at prime_table_m ASSIGNING FIELD-SYMBOL(<pointer>).
-                if divider mod <pointer> = 0.
-                    CONTINUE.
-                else.
-                    exit.
-                endif.
-            endloop.
-            append divider to prime_table_m.
-        endif.
-        divider = divider + 1.
-    endwhile.
+        temp_number = m_number.
+
+        while temp_number NE 1.
+            if temp_number mod divider = 0.
+                append divider to prime_table_m.
+                temp_number = temp_number / divider.
+                continue.
+            endif.
+            divider = divider + 1.
+        endwhile.
 
     prime_numbers = prime_table_m.
 
