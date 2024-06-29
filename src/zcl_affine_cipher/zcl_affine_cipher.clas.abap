@@ -27,10 +27,8 @@ CLASS zcl_affine_cipher DEFINITION
              importing x type i
                        dividers type integertab
              RETURNING VALUE(result) type i
-             RAISING   cx_parameter_invalid,
-      get_alphabet_index
-             IMPORTING entry_index type string
-             returning value(alphabet_index) type i.
+             RAISING   cx_parameter_invalid.
+
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -73,12 +71,9 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
     do strlen( lower_phrase ) + 1 div 5 times.
         do 5 times.
         if lower_phrase+index_of_phrase(1) CA alphabet.
-               data(letter) = lower_phrase+index_of_phrase(1).
-*               while alphabet+temporary_index(1) NE lower_phrase+index_of_phrase(1).
-*                     temporary_index = temporary_index + 1.
-*               ENDWHILE.
-               temporary_index = get_alphabet_index( entry_index = letter ).
-               index_of_letter = temporary_index.
+               if alphabet CA lower_phrase+index_of_phrase(1).
+                    index_of_letter = sy-fdpos.
+               endif.
                new_index = ( key-a * index_of_letter + key-b ) mod m.
                cipher = cipher && alphabet+new_index(1).
                temporary_index = 0.
@@ -129,11 +124,9 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
 
     while index_of_letter NE strlen( cipher ).
         if cipher+index_of_letter(1) CA alphabet.
-            data(letter) = cipher+index_of_letter(1).
-*            while alphabet+temporary_index(1) NE cipher+index_of_letter(1).
-*                     temporary_index = temporary_index + 1.
-*            ENDWHILE.
-            temporary_index = get_alphabet_index( entry_index = letter ).
+            if alphabet CA cipher+index_of_letter(1).
+                    temporary_index = sy-fdpos.
+               endif.
             data(a_1) = temporary_index - key-b.
             new_index =  ( mmi * a_1 ) mod m .
             phrase = phrase && alphabet+new_index(1).
@@ -190,62 +183,5 @@ CLASS zcl_affine_cipher IMPLEMENTATION.
         result = 1.
   endmethod.
 
-  method get_alphabet_index.
-       case entry_index.
-        when 'a'.
-            alphabet_index = 0.
-        when 'b'.
-            alphabet_index = 1.
-        when 'c'.
-            alphabet_index = 2.
-        when 'd'.
-            alphabet_index = 3.
-        when 'e'.
-            alphabet_index = 4.
-        when 'f'.
-            alphabet_index = 5.
-        when 'g'.
-            alphabet_index = 6.
-        when 'h'.
-            alphabet_index = 7.
-        when 'i'.
-            alphabet_index = 8.
-        when 'j'.
-            alphabet_index = 9.
-        when 'k'.
-            alphabet_index = 10.
-        when 'l'.
-            alphabet_index = 11.
-        when 'm'.
-            alphabet_index = 12.
-        when 'n'.
-            alphabet_index = 13.
-        when 'o'.
-            alphabet_index = 14.
-        when 'p'.
-            alphabet_index = 15.
-        when 'q'.
-            alphabet_index = 16.
-        when 'r'.
-            alphabet_index = 17.
-        when 's'.
-            alphabet_index = 18.
-        when 't'.
-            alphabet_index = 19.
-        when 'u'.
-            alphabet_index = 20.
-        when 'v'.
-            alphabet_index = 21.
-        when 'w'.
-            alphabet_index = 22.
-        when 'x'.
-            alphabet_index = 23.
-        when 'y'.
-            alphabet_index = 24.
-        when 'z'.
-            alphabet_index = 25.
-       endcase.
-
-  endmethod.
 ENDCLASS.
 
