@@ -28,157 +28,97 @@ CLASS zcl_book_store IMPLEMENTATION.
   METHOD calculate_total.
     " add solution here
 
-  data summ type p LENGTH 3 DECIMALS 2.
+    types: begin of counter_struct,
+           book_id type i,
+           quantity type i,
+           end of counter_struct.
 
-  types summ type p LENGTH 3 DECIMALS 2.
+    data counter_table_p type table of counter_struct.
 
-  data summ_table type table of summ.
+    counter_table_p = value #( ( book_id = 1 )
+                             ( book_id = 2 )
+                             ( book_id = 3 )
+                             ( book_id = 4 )
+                             ( book_id = 5 ) ).
 
-
-    data temp_table type table of string.
-    data temp type string.
-    data ind type i.
-
-    data max_rows type table of i.
-    append 11 to max_rows.
-    append 8 to max_rows.
-
-    data: quantity_1 type i,
-          quantity_5 type i.
-
-    loop at basket ASSIGNING FIELD-SYMBOL(<c>).
-        case <c>.
-            when 1.
-                quantity_1 = quantity_1 + 1.
-            when 5.
-                quantity_5 = quantity_5 + 1.
-        ENDCASE.
+    loop at basket ASSIGNING FIELD-SYMBOL(<pointer_a>).
+        counter_table_p[ book_id = <pointer_a> ]-quantity += 1.
     endloop.
 
-    data basket_p type table of book_id.
+    sort counter_table_p by quantity DESCENDING.
 
-    basket_p = basket.
+    data counter_table type table of counter_struct.
+    data max_stack type i value 5.
+    data sets_table type table of string.
+    data current_id_txt type string.
+    data index type i value 1.
+    data index_out type i value 1.
 
-    if quantity_5 > quantity_1.
-        sort basket_p DESCENDING.
-    endif.
+    types summ type p LENGTH 3 DECIMALS 1.
+    data summ_total type summ.
+    data summ_table type table of summ.
 
+    do 5 times.
+    counter_table = counter_table_p.
+    loop at counter_table ASSIGNING field-SYMBOL(<pointer_counter>).
+        index_out = sy-tabix.
+        do <pointer_counter>-quantity times.
+            if <pointer_counter>-quantity <= 0.
+                CONTINUE.
+            endif.
+            if lines( sets_table ) = 0.
+                append <pointer_counter>-book_id to sets_table.
+                counter_table[ index_out ]-quantity -= 1.
+                CONTINUE.
+            endif.
+            loop at sets_table ASSIGNING FIELD-SYMBOL(<pointer_set>).
+                if <pointer_counter>-quantity = 0.
+                    exit.
+                endif.
+                current_id_txt = <pointer_counter>-book_id.
+                if sets_table[ sy-tabix ] NS current_id_txt and strlen( sets_table[ sy-tabix ] ) < 2 * max_stack.
+                    sets_table[ sy-tabix ] = sets_table[ sy-tabix ] && current_id_txt.
+                    counter_table[ index_out ]-quantity -= 1.
+                elseif sy-tabix = lines( sets_table ).
+                    append <pointer_counter>-book_id to sets_table.
+                    counter_table[ index_out ]-quantity -= 1.
+                    CONTINUE.
+*                elseif sy-tabix = lines( sets_table ) and sets_table[ sy-tabix ] CA current_id_txt.
+*
+                else.
 
-    loop at max_rows ASSIGNING FIELD-SYMBOL(<max_stack>).
-      loop at basket_p ASSIGNING FIELD-SYMBOL(<a>).
-        temp = <a>.
-        if lines( temp_table ) = 0.
-            append temp to temp_table.
-            CONTINUE.
-        else.
-            loop at temp_table ASSIGNING FIELD-SYMBOL(<existing_row>).
-                ind = sy-tabix.
-                    if strlen( <existing_row> ) < <max_stack>.
-                        if <existing_row> CS temp.
-                            if ind = lines( temp_table ).
-                                append temp to temp_table.
-                                exit.
-                            else.
-                                CONTINUE.
-                            endif.
-                        else.
-                            temp_table[ ind ] = temp_table[ ind ] && temp.
-                            exit.
-                        endif.
-                     else.
-                         if ind = lines( temp_table ).
-                            append temp to temp_table.
-                            exit.
-                         else.
-                            CONTINUE.
-                         endif.
-                     endif.
-             ENDLOOP.
-        endif.
-      ENDLOOP.
+                    CONTINUE.
+                endif.
+            endloop.
+         enddo.
+    endloop.
 
-
-
-
-
-
-      loop at temp_table ASSIGNING FIELD-SYMBOL(<b>).
-        case strlen( <b> ).
-            when 10.
-                summ = summ + '30'.
-            when 8.
-                summ = summ + '25.6'.
-            when 6.
-                summ = summ + '21.6'.
+    loop at sets_table ASSIGNING FIELD-SYMBOL(<pointer_summ>).
+        case strlen( <pointer_summ> ) / 2.
+            when 5.
+                summ_total += '30'.
             when 4.
-                summ = summ + '15.2'.
+                summ_total += '25.6'.
+            when 3.
+                summ_total += '21.6'.
             when 2.
-                summ = summ + '8'.
-        ENDCASE.
-      endloop.
-      append summ to summ_table.
-      clear summ.
-      clear temp_table.
-  endloop.
+                summ_total += '15.2'.
+            when 1.
+                summ_total += '8'.
+        endcase.
+    endloop.
 
-  loop at basket_p ASSIGNING <a>.
-        temp = <a>.
-        if lines( temp_table ) = 0.
-            append temp to temp_table.
-            CONTINUE.
-        else.
-            loop at temp_table ASSIGNING <existing_row>.
-                ind = sy-tabix.
-                    if temp NE basket_p[ 1 ].
-                      if  ind NE lines( temp_table ).
-                           if strlen( <existing_row> ) >= strlen( temp_table[ ind + 1 ] ).
-                                CONTINUE.
-                           else.
-                               if <existing_row> CS temp.
-                                  CONTINUE.
-                               else.
-                                  temp_table[ ind ] = temp_table[ ind ] && temp.
-                                  exit.
-                               endif.
-                           endif.
-                      else.
-                          temp_table[ ind ] = temp_table[ ind ] && temp.
-                          exit.
-                       endif.
-                    else.
-                       append temp to temp_table.
-                       exit.
-                    endif.
-             ENDLOOP.
-        endif.
-      ENDLOOP.
+    append summ_total to summ_table.
+    clear summ_total.
+    clear sets_table.
 
-      loop at temp_table ASSIGNING <b>.
-        case strlen( <b> ).
-            when 10.
-                summ = summ + '30'.
-            when 8.
-                summ = summ + '25.6'.
-            when 6.
-                summ = summ + '21.6'.
-            when 4.
-                summ = summ + '15.2'.
-            when 2.
-                summ = summ + '8'.
-        ENDCASE.
-      endloop.
-      append summ to summ_table.
+    max_stack -= 1.
 
+    enddo.
 
+    sort summ_table ASCENDING.
 
-
-  sort summ_table ascending.
-  total = summ_table[ 1 ].
-
-
-
-
-
+    total = summ_table[ 1 ].
 
   ENDMETHOD.
 
